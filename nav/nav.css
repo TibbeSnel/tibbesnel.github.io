@@ -1,0 +1,110 @@
+/* Reset default margin and padding */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* ============================== */
+/* DESKTOP NAVIGATION */
+/* ============================== */
+nav {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #000036f5;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 6rem;
+  z-index: 10;
+  box-shadow: 0 0.188rem 0.25rem #00000036;
+  text-align: center;
+  overflow: hidden;
+  font-size: 1.5rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the menu */
+  padding: 0 2rem;
+}
+
+.nav-logo-container {
+  position: absolute;
+  left: 2rem; /* Adjust as needed */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+
+.menu-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-weight: bold;
+}
+
+nav ul li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f8f9fa;
+  font-weight: 200;
+}
+
+nav ul li:hover {
+  font-weight: 600;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  flex-wrap: nowrap;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #f8f9fa;
+  padding: 0.625rem 0.938rem;
+}
+
+/* Logo sizing */
+.nav-logo {
+  width: 3.125rem;
+}
+
+/* ============================== */
+/* RESPONSIVE STYLES */
+/* ============================== */
+@media (max-width: 480px), (orientation: portrait) {
+
+  .nav-logo-container {
+    position: relative !important; /* or static */
+    left: 0;
+  }
+
+  .menu li:last-child {
+    visibility: collapse;
+  }
+
+  .menu-container {
+    justify-content: center;
+  }
+
+}
+
+@media (max-width: 200px), (orientation: portrait) {
+  .menu a {
+    padding: 0.625rem 0.5rem;
+    font-size: 1.3rem;
+  }
+}

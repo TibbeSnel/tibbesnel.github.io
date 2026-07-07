@@ -1,0 +1,136 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Portfolio – Home</title>
+  <link rel="icon" type="image/x-icon" href="assets/logo.ico">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="nav/nav.css" />
+  <link rel="stylesheet" href="footer/footer.css" />
+
+  <!-- font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+  <!-- Shared nav -->
+  <nav-component src="nav/nav.html"></nav-component>
+
+  <!-- Page content -->
+  <main id="index-main">
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Hi! I'm Tibbe, welcome to <br> my portfolio</h1>
+        <p>This is my portfolio, where I showcase my projects and what I’ve been working on. I'm always curious, learning, and building something new.</p>
+      </div>
+      <div class="hero-image carousel">
+        <!-- Carousel slides will be injected here -->
+        <div class="arrow prev" id="prevBtn">&#10094;</div>
+        <div class="arrow next" id="nextBtn">&#10095;</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Shared footer -->
+  <footer-component src="footer/footer.html"></footer-component>
+
+  <!-- Shared script (defines your custom elements) -->
+  <script src="script.js" defer></script>
+
+  <!-- GitHub Carousel with sessionStorage -->
+  <script type="module">
+    console.log(window.innerWidth + " x " + window.innerHeight)
+    document.addEventListener('DOMContentLoaded', () => {
+      const carouselEl = document.querySelector('.hero-image.carousel');
+      let slideIndex = 0;
+      let projects = [];
+
+      const cacheKey = 'githubRepos';
+      const cacheTimeKey = 'githubReposTime';
+      const cacheDuration = 1000 * 60 * 60; // 1 hour
+
+      const cached = sessionStorage.getItem(cacheKey);
+      const cachedTime = sessionStorage.getItem(cacheTimeKey);
+      const isCacheValid = cached && cachedTime && (Date.now() - parseInt(cachedTime)) < cacheDuration;
+
+      if (isCacheValid) {
+        try {
+          projects = JSON.parse(cached);
+          renderSlides();
+          showSlide(slideIndex);
+        } catch (e) {
+          console.warn('Failed to parse cached data, fetching fresh.');
+          fetchRepos();
+        }
+      } else {
+        fetchRepos();
+      }
+
+      function fetchRepos() {
+        fetch('https://api.github.com/users/TibbeSnel/repos')
+          .then(res => res.json())
+          .then(repos => {
+            repos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+            projects = repos.slice(0, 5);
+
+            sessionStorage.setItem(cacheKey, JSON.stringify(projects));
+            sessionStorage.setItem(cacheTimeKey, Date.now().toString());
+
+            renderSlides();
+            showSlide(slideIndex);
+          })
+          .catch(err => {
+            console.error('Failed to fetch GitHub projects:', err);
+            const errorSlide = document.createElement('div');
+            errorSlide.className = 'carousel-slide';
+            errorSlide.innerHTML = `<div class="title-bar"><div class="title-text">Error loading projects</div><div class="summary">Please try again later.</div></div>`;
+            carouselEl.insertBefore(errorSlide, document.getElementById('prevBtn'));
+          });
+      }
+
+      function renderSlides() {
+        projects.forEach((repo, i) => {
+          const slide = document.createElement('div');
+          slide.className = 'carousel-slide';
+          slide.innerHTML = `
+          <a href="projects.html">
+            <img src="https://raw.githubusercontent.com/TibbeSnel/${repo.name}/main/docs/thumb.jpg?random=${i + 1}" 
+                 alt="${repo.name} thumbnail" 
+                 onerror="this.style.display='none'">
+          </a>
+          <div class="title-bar">
+            <div class="title-text">${repo.name}</div>
+            <div class="summary">${repo.description || 'No description available.'}</div>
+          </div>`;
+          carouselEl.insertBefore(slide, document.getElementById('prevBtn'));
+        });
+      }
+
+      function showSlide(index) {
+        const slides = document.querySelectorAll('.carousel-slide');
+        slides.forEach((slide, i) => {
+          slide.style.display = (i === index) ? 'block' : 'none';
+        });
+      }
+
+      document.getElementById('prevBtn').addEventListener('click', () => {
+        slideIndex = (slideIndex - 1 + projects.length) % projects.length;
+        showSlide(slideIndex);
+      });
+
+      document.getElementById('nextBtn').addEventListener('click', () => {
+        slideIndex = (slideIndex + 1) % projects.length;
+        showSlide(slideIndex);
+      });
+    });
+  </script>
+
+</body>
+
+</html>

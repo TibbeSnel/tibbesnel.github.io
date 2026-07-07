@@ -1,0 +1,82 @@
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #202020 #000;
+  overflow-y: auto;
+}
+
+body {
+  background: #000;
+}
+
+.terminal-main,
+.terminal-main * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
+  color: #f8f9fa;
+  font-size: 1.1rem;
+  font-family: Consolas, monospace;
+  color: #00ff00;
+}
+@media (min-width: 2240px) {
+  .terminal-main,
+  .terminal-main * {
+    font-size: 1.4rem;
+  }
+  .terminal-main {
+    padding-top: 10rem !important;
+  }
+}
+.terminal-main {
+  padding-top: 6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-bottom: 4rem;
+}
+#terminal {
+  width: 100%;
+  overflow-y: visible;
+  padding: 1rem;
+  background-color: #000;
+}
+#output {
+  white-space: pre-wrap;
+}
+.prompt {
+  display: flex;
+  align-items: flex-start;
+}
+.prompt span:last-of-type {
+  margin-right: 1ch;
+  white-space: nowrap;
+}
+input#terminalInput {
+  background: #000;
+  color: #fff;
+  border: none;
+  outline: none;
+  flex: 1 1 auto;   /* grow and shrink as needed */
+  min-width: 0;     /* allow it to get smaller than its intrinsic size */
+}
+.prompt-user {
+  color: #00ff00 !important;
+}
+.prompt-path {
+  color: #00aaff !important;
+}
+.prompt-terminal,
+#output,
+#output div {
+  color: #fff !important;
+}
+
+@media (max-width: 768px), (orientation: portrait) {
+  .terminal-main,
+  .terminal-main * {
+    font-size: 0.9rem;
+  }
+}
+

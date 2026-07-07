@@ -1,0 +1,127 @@
+<!-- projects.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Portfolio – Projects</title>
+  <link rel="icon" type="image/x-icon" href="assets/logo.ico">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="nav/nav.css" />
+  <link rel="stylesheet" href="footer/footer.css" />
+
+  <!-- font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+  <!-- Shared nav -->
+  <nav-component src="nav/nav.html"></nav-component>
+
+  <!-- Page content -->
+  <main id="projects-main">
+    <div id="content">
+      <!-- GitHub project tiles will be injected here -->
+    </div>
+  </main>
+
+  <!-- Shared footer -->
+  <footer-component src="footer/footer.html"></footer-component>
+
+  <!-- Shared script (defines your custom elements) -->
+  <script src="script.js" defer></script>
+
+  <!-- GitHub Projects with sessionStorage -->
+  <script type="module">
+    window.addEventListener('DOMContentLoaded', () => {
+      const contentDiv = document.getElementById('content');
+      const cacheKey = 'githubRepos';
+      const cacheTimeKey = 'githubReposTime';
+      const cacheDuration = 1000 * 60 * 60; // 1 hour in milliseconds
+
+      const cachedData = sessionStorage.getItem(cacheKey);
+      const cachedTime = sessionStorage.getItem(cacheTimeKey);
+
+      const isCacheValid = cachedData && cachedTime && (Date.now() - parseInt(cachedTime)) < cacheDuration;
+
+      if (isCacheValid) {
+        try {
+          const repos = JSON.parse(cachedData);
+          renderProjects(repos);
+        } catch (e) {
+          console.warn('Invalid cache. Refetching repos.');
+          fetchRepos();
+        }
+      } else {
+        fetchRepos();
+      }
+
+      function fetchRepos() {
+        fetch('https://api.github.com/users/TibbeSnel/repos')
+          .then(res => res.json())
+          .then(async repos => {
+            repos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+            const withStatus = await Promise.all(repos.map(async repo => {
+              const readmeUrl = `https://raw.githubusercontent.com/TibbeSnel/${repo.name}/main/docs/README.md`;
+
+              try {
+                const res = await fetch(readmeUrl);
+                const text = await res.text();
+                const match = text.match(/^#\s*Status:\s*(.+)$/im);
+                if (match) repo.status = match[1].trim();
+              } catch (e) {
+                console.warn(`Failed to fetch README for ${repo.name}`, e);
+              }
+
+              return repo;
+            }));
+
+            sessionStorage.setItem(cacheKey, JSON.stringify(withStatus));
+            sessionStorage.setItem(cacheTimeKey, Date.now().toString());
+
+            renderProjects(withStatus);
+          })
+          .catch(err => {
+            contentDiv.innerHTML = `<p class="text-red-500">Error loading GitHub projects.</p>`;
+            console.error(err);
+          });
+      }
+
+      function renderProjects(repos) {
+        const container = document.createElement('div');
+        container.className = 'tile-container';
+
+        repos.forEach(repo => {
+          const imageUrl = `https://raw.githubusercontent.com/TibbeSnel/${repo.name}/main/docs/thumb.jpg`;
+
+          const tile = document.createElement('a');
+          tile.href = repo.html_url;
+          tile.target = '_blank';
+          tile.className = 'tile';
+
+          tile.innerHTML = `
+          ${repo.status ? `<div class="projects-ribbon">${repo.status}</div>` : ''}
+          <img src="${imageUrl}" alt="${repo.name} thumbnail" onerror="this.style.display='none'">
+          <div class="tile-content">
+            <p class="tile-date">${new Date(repo.updated_at).toLocaleDateString()}</p>
+            <h3 class="tile-title">${repo.name}</h3>
+            <p class="tile-intro">${repo.description || 'No description available.'}</p>
+          </div>
+        `;
+
+          container.appendChild(tile);
+        });
+
+        contentDiv.appendChild(container);
+      }
+    });
+  </script>
+
+</body>
+
+</html>
