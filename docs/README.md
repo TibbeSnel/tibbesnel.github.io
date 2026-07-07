@@ -1,6 +1,6 @@
 # Portfolio Site
 
-#### This project began when I wanted to record my projects in some way. Mostly for myself, so I could look back at the weird stuff I built. But I also wanted to share my projects with the world. So I decided to build a site. I looked for inspiration, and started working. 
+#### This project began when I wanted to record my projects in some way. Mostly for myself, so I could look back at the weird stuff I built. But I also wanted to share my projects with the world. So I decided to build a site. 
 
 ## How it works
 I am not going to explain the whole site here, but here are a few features I'd like to share:
