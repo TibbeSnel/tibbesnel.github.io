@@ -363,8 +363,7 @@ nav-component {
   background-color: #000045;
   border-radius: 12px;
   padding: 1rem;
-  width: 100%;
-  width: 20rem;
+  width: 22rem;
   position: relative;
   display: flex;
   align-items: center;
@@ -374,6 +373,7 @@ nav-component {
 
 .edu-card-content {
   display: flex;
+  margin-left: 0.5rem;
   align-items: flex-start;
   gap: 1rem;
   width: 100%;
